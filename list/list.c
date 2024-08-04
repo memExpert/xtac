@@ -2,6 +2,13 @@
 #include <inttypes.h>
 #include <malloc.h>
 #include <string.h>
+/*
+Add LIST_pushback(), LIST_pushforw(), LIST_popback, LIST_popforw, LIST_get_data,
+LIST_update_data, LIST_delitem
+*/
+
+
+
 
 static LIST* LIST_item_init(void) {
     LIST* new_list_item = (LIST*) malloc(sizeof(LIST));
