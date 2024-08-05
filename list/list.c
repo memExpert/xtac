@@ -7,6 +7,13 @@ Add LIST_pushback(), LIST_pushforw(), LIST_popback, LIST_popforw, LIST_get_data,
 LIST_update_data, LIST_delitem
 */
 
+/*
+    Фактически можно реализовать это как функции высшего порядка.
+    Например передавать pop-функциям в качестве аргумента указатель на функции, вроде
+    getdouble(void* list_data, double* dst). Внутри будет просто явное преобразование
+    из поля data структуры элемента списка к даблу и переведение запись в dst.
+*/
+
 
 
 
