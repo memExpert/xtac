@@ -14,17 +14,6 @@
 #include <inttypes.h>
 #include <malloc.h>
 #include <string.h>
-/*
-Add LIST_pushback(), LIST_pushforw(), LIST_popback, LIST_popforw, LIST_get_data,
-LIST_update_data, LIST_delitem
-*/
-
-/*
-    Фактически можно реализовать это как функции высшего порядка.
-    Например передавать pop-функциям в качестве аргумента указатель на функции, вроде
-    getdouble(void* list_data, double* dst). Внутри будет просто явное преобразование
-    из поля data структуры элемента списка к даблу и переведение запись в dst.
-*/
 
 /*******************************************************************************
  *                      STATIC FUNCTIONS DEFINITIONS                           *
@@ -71,7 +60,7 @@ size_t LL_list_len(const LL_base* list) {
 LL_base* LL_list_init (size_t data_size) {
     LL_base *list = (LL_base*) malloc(sizeof(LL_base));
     if(list) {
-        list->ds = data_size;
+        list->data_sz = data_size;
         list->first = NULL;
         list->last  = NULL;
         list->len = 0;
@@ -96,9 +85,7 @@ bool LL_list_free (LL_base* list) {
     if(list) {
         while (LL_popf(list, &garbage))
             ;
-        list->ds = 0;
-        list->len = 0;
-        isFree = true;
+        free(list);
     } else {
         isFree = false;
     }
@@ -108,9 +95,7 @@ bool LL_list_free (LL_base* list) {
 
 bool LL_pushf (LL_base* list_base, const void *data) {
 
-    if(!(list_base && data && LL_inc_len(list_base))) {
-        return false;
-    }
+    if(!(list_base && data && LL_inc_len(list_base))) return false;
     LL_item* new_first = LL_item_init();
 
     if(!new_first) {
@@ -118,28 +103,31 @@ bool LL_pushf (LL_base* list_base, const void *data) {
         return false;
     }
     
-    new_first->data = malloc(list_base->ds);
+    new_first->data = malloc(list_base->data_sz);
     if(!new_first->data) {
         LL_dec_len(list_base);
         LL_item_free(new_first);
         return false;
     }
-    if(LL_list_len(list_base) == 1) {
-        list_base->last = list_base->first;
-    }
-    memmove(new_first->data, data, list_base->ds);
+
+    memmove(new_first->data, data, list_base->data_sz);
     new_first->next = list_base->first;
     list_base->first = new_first;
     
+    if(LL_list_len(list_base) == 1) {
+        list_base->last = list_base->first;
+    }
+
     return true;
 }
 
 bool LL_popf (LL_base* list_base, void *data) {
     LL_item* tmp = NULL;
-    if(!list_base && data && !LL_dec_len(list_base))  return false;
+    if(!list_base && !data)    return false;
+    if(!LL_dec_len(list_base)) return false;
     tmp = list_base->first;
     if(tmp) {
-        memmove(data, tmp->data, list_base->ds);
+        memmove(data, tmp->data, list_base->data_sz);
         list_base->first = tmp->next;
         LL_item_free(tmp);
     } else {
@@ -150,11 +138,53 @@ bool LL_popf (LL_base* list_base, void *data) {
 }
 
 bool LL_pushb (LL_base* list_base, void const *data) {
+    if(!(list_base && data && LL_inc_len(list_base))) return false;
+    LL_item* new_last = LL_item_init();
 
+    if(!new_last) {
+        LL_dec_len(list_base);
+        return false;
+    }
+
+    new_last->data = malloc(list_base->data_sz);
+    if(!new_last->data) {
+        LL_dec_len(list_base);
+        LL_item_free(new_last);
+        return false;
+    }
+
+    memmove(new_last->data, data, list_base->data_sz);
+    new_last->next = list_base->last;
+    list_base->last = new_last;
+
+    if(LL_list_len(list_base) == 1) {
+        list_base->first = list_base->last;
+    }
+
+    return true;
 }
 
-bool LL_popb (LL_base* const list_base, void *data) {
 
+/* error inside this function. Need tests */
+bool LL_popb (LL_base* const list_base, void *data) {
+    LL_item* tmp = NULL;
+
+    if(!list_base && !data)    return false;
+    if(!LL_dec_len(list_base)) return false;
+    
+    tmp = list_base->first;
+    if(tmp) {
+        memmove(data, list_base->last, list_base->data_sz);
+        while(tmp->next != list_base->last){
+            tmp = tmp->next;
+        }
+        LL_item_free(list_base->last);
+        list_base->last = tmp;
+    } else {
+        LL_inc_len(list_base);
+        return false;
+    }
+    return true;
 }
 
 
@@ -162,7 +192,7 @@ bool LL_popb (LL_base* const list_base, void *data) {
 #define COUNT_OF(_x) (sizeof(_x) / sizeof(*_x))
 
 int main(void) {
-    int arr[] = {1, 2, 3, 4, 5, 6, 7, 8, 9};
+    int arr[] = {1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009};
     int result = 0;
     LL_base* list = LL_list_init(sizeof(int));
     if(!list) return 1;
@@ -171,8 +201,18 @@ int main(void) {
         printf("%"PRId64"\n", LL_list_len(list));
     }
     while(LL_popf(list, (void*)&result)) {
+        printf("%d - %"PRId64"\n", result, LL_list_len(list));
+    }
+    printf("\n");
+
+    for(size_t i = 0; i < COUNT_OF(arr); i++){
+        LL_pushb(list, (void*)(arr + i));
+        printf("%"PRId64"\n", LL_list_len(list));
+    }
+    while(LL_popb(list, (void*)&result)) {
         printf("%d ", result);
     }
+
     printf("\n");
     return 0;
 }

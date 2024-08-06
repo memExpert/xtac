@@ -12,15 +12,10 @@ typedef struct linked_list_item
 typedef struct linked_list_base {
     LL_item* first;                 /* ptr to first list item */
     LL_item* last;                  /* ptr to last list item */
-    size_t len;                     /* list length */
-    size_t ds;                      /* data size */
+    size_t   len;                     /* list length */
+    size_t   data_sz;                      /* data size */
 } LL_base;
-/**
- * @brief 
- * 
- * @param data_size 
- * @return LL_base 
- */
+
 extern LL_base* LL_list_init (size_t data_size);
 extern size_t LL_list_len(const LL_base* list);
 extern bool LL_list_free (LL_base* to_free);
