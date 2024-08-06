@@ -169,7 +169,7 @@ bool LL_pushf (LL_base* list_base, const void *data) {
     new_first->data = malloc(list_base->data_size);
     if(!new_first->data) {
         LL_dec_len(list_base);
-        free(new_first);
+        LL_item_free(new_first);
         return false;
     }
 
