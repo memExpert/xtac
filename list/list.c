@@ -154,7 +154,9 @@ bool LL_pushb (LL_base* list_base, void const *data) {
     }
 
     memmove(new_last->data, data, list_base->data_sz);
-    new_last->next = list_base->last;
+    if(list_base->last) {
+        list_base->last->next = new_last;
+    }
     list_base->last = new_last;
 
     if(LL_list_len(list_base) == 1) {
@@ -175,10 +177,11 @@ bool LL_popb (LL_base* const list_base, void *data) {
     tmp = list_base->first;
     if(tmp) {
         memmove(data, list_base->last, list_base->data_sz);
-        while(tmp->next != list_base->last){
+        while(tmp->next != list_base->last){ /* tmp = [last] - 1*/
             tmp = tmp->next;
         }
         LL_item_free(list_base->last);
+        tmp->next = NULL;
         list_base->last = tmp;
     } else {
         LL_inc_len(list_base);
@@ -190,12 +193,13 @@ bool LL_popb (LL_base* const list_base, void *data) {
 
 
 #define COUNT_OF(_x) (sizeof(_x) / sizeof(*_x))
-
+#include <stdio.h>
 int main(void) {
-    int arr[] = {1001, 1002, 1003, 1004, 1005, 1006, 1007, 1008, 1009};
+    int arr[] = {10,11,12};
     int result = 0;
     LL_base* list = LL_list_init(sizeof(int));
     if(!list) return 1;
+    /*
     for(size_t i = 0; i < COUNT_OF(arr); i++){
         LL_pushf(list, (void*)(arr + i));
         printf("%"PRId64"\n", LL_list_len(list));
@@ -204,15 +208,15 @@ int main(void) {
         printf("%d - %"PRId64"\n", result, LL_list_len(list));
     }
     printf("\n");
-
+    */
     for(size_t i = 0; i < COUNT_OF(arr); i++){
         LL_pushb(list, (void*)(arr + i));
         printf("%"PRId64"\n", LL_list_len(list));
     }
     while(LL_popb(list, (void*)&result)) {
-        printf("%d ", result);
+        printf("%d - %"PRId64"\n", result, LL_list_len(list));
     }
-
+    printf("%d - %"PRId64"\n", result, LL_list_len(list));
     printf("\n");
     return 0;
 }
