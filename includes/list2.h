@@ -17,7 +17,7 @@ typedef struct linked_list_base {
 } LL_base;
 
 typedef enum {
-    LL_EXEC_SUCCESS = 1,
+    LL_EXEC_SUCCESS = 0,
     LL_EXEC_NULL_BASE_PTR,
     LL_EXEC_NO_MEMORY,
     LL_EXEC_LIST_BLOCKED,

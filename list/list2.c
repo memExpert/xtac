@@ -93,11 +93,11 @@ LL_base* LL_init_base(size_t data_size) {
 }
 
 void LL_free_list_from(LL_item** current) {
-    if(!(current && *current)) {
+    printf("LL_free_list_from \n");
+    if(!current || !(*current)) {
         return;
-    } else {
-        LL_free_list_from(&((*current)->next));
     }
+    LL_free_list_from(&((*current)->next));
     LL_free_item(current);
     *current = NULL;
 }
@@ -147,6 +147,7 @@ LL_EXEC_RESULT LL_pushf(LL_base* list, void* data) {
 
 LL_EXEC_RESULT LL_popf(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
+
     if(LL_dec_len(list)) {
         LL_item* tmp_ptr = *(list->first);
         *(list->first) = tmp_ptr->next;
@@ -168,9 +169,12 @@ int main(void) {
         LL_pushf(tlist, &(arr[i]));
         printf("List len: %"PRId64"\n", tlist->len);
     }
+    LL_free_base(&tlist);
+    return 0;
     for(size_t i = 0; i < sizeof(arr) / sizeof(*arr); i++){
         LL_popf(tlist, &temp_int);
         printf("List len: %"PRId64", temp_int: %d\n", tlist->len, temp_int);
     }
+
     return 0;
 }
