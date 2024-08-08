@@ -144,7 +144,9 @@ LL_EXEC_RESULT LL_pushf(LL_base* list, void* data) {
 
     if(LL_inc_len(list)) {
         if(LL_addf(&(list->first), data, list->data_sz)) {
-            if(LL_length(list) == 1) list->last = list->first;
+            if(LL_length(list) == 1) {
+                list->last = list->first;
+            }
             return LL_EXEC_SUCCESS;
         } else {
             LL_dec_len(list);
@@ -159,10 +161,10 @@ LL_EXEC_RESULT LL_popf(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(LL_dec_len(list)) {
-        LL_item* tmp_ptr = list->first;
-        list->first = list->first->next;
-        memmove(data, tmp_ptr->data, list->data_sz);
-        LL_free_item(&tmp_ptr);
+        memmove(data, list->first, list->data_sz);
+        LL_item* tmp_ptr = list->first->next;
+        LL_free_item(&list->first);
+        list->first = tmp_ptr;
     } else {
         return LL_EXEC_LIST_EMPTY;
     }
@@ -175,7 +177,9 @@ LL_EXEC_RESULT LL_pushb(LL_base* list, void* data) {
 
     if(LL_inc_len(list)) {
         if(LL_addb(&(list->last), data, list->data_sz)){
-            if(LL_length(list) == 1) list->first = list->last;
+            if(LL_length(list) == 1) {
+                list->first = list->last;
+            }
             list->last = list->last->next;
             return LL_EXEC_SUCCESS;
         } else {
@@ -194,7 +198,7 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
     if(LL_dec_len(list)) {
         memmove(data, list->last->data, list->data_sz);
         LL_free_item(&(list->last));  /* TODO memory leak? Maybe i need to  */
-                                      /*  return to ptr to ptr in LL_base   */
+                                      /* return to ptr to ptr in LL_base    */
         if(LL_length(list) == 0) {    /* I must think about it because      */
             list->last = list->first; /* this can target on memory leak     */
         } else {
@@ -210,7 +214,7 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
 
 
 int main(void) {
-    int arr[] = {11}/*,22,33,44,55,66}*/;
+    int arr[] = {11,22,33,44,55,66};
     int temp_int = 0;
     LL_base* tlist = LL_init_base(sizeof(int));
     for(size_t i = 0; i < sizeof(arr) / sizeof(*arr); i++){
@@ -229,9 +233,26 @@ int main(void) {
     }
 
     for(size_t i = 0; i < sizeof(arr) / sizeof(*arr); i++){
-        LL_popb(tlist, &temp_int);
+        LL_popf(tlist, &temp_int);
         printf("List len: %"PRId64", temp_int: %d\n", tlist->len, temp_int);
     }
+
+    if(tlist->first) {
+        printf("first memory leak detected\n");
+        if(tlist->first->next) {
+            printf("ooooo...");
+        }
+    }
+    if(tlist->last) {
+        printf("Second memory leak detected\n");
+        if(tlist->last->next) {
+            printf("hhhhhhhhhhhhhh???\n");
+        }
+        if(tlist->last->next->next){
+            printf("\n 2:00 AM, why i'm here?\n\n");
+        }
+    }
+
 
     return 0;
 }
