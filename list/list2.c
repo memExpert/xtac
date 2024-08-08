@@ -32,7 +32,6 @@ LL_item* LL_init_item(void) {
 
 void LL_free_item(LL_item** item) {
     if(!(item && *item)) return;
-
     free((*item)->data);
     free(*item);
     *item = NULL;
@@ -194,8 +193,13 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
 
     if(LL_dec_len(list)) {
         memmove(data, list->last->data, list->data_sz);
-        LL_free_item(&(list->last));
-        list->last = LL_get_item_n(list, LL_length(list) - 1);
+        LL_free_item(&(list->last));  /* TODO memory leak? Maybe i need to  */
+                                      /*  return to ptr to ptr in LL_base   */
+        if(LL_length(list) == 0) {    /* I must think about it because      */
+            list->last = list->first; /* this can target on memory leak     */
+        } else {
+            list->last = LL_get_item_n(list, LL_length(list) - 1);
+        }
         return LL_EXEC_SUCCESS;        
     } else {
         return LL_EXEC_LIST_EMPTY;
