@@ -10,10 +10,10 @@ typedef struct linked_list_item
 } LL_item;
 
 typedef struct linked_list_base {
-    LL_item** first;                 /* [*]->[ ]->[ ]->[ ]->NULL     */
-    LL_item** last;                  /* [ ]->[ ]->[ ]->[*]->NULL     */
-    size_t    len;                   /* list length                  */
-    size_t    data_sz;               /* sizeof(your_own_t/default_t) */
+    LL_item* first;                 /* [*]->[ ]->[ ]->[ ]->NULL     */
+    LL_item* last;                  /* [ ]->[ ]->[ ]->[*]->NULL     */
+    size_t   len;                   /* list length                  */
+    size_t   data_sz;               /* sizeof(your_own_t/default_t) */
 } LL_base;
 
 typedef enum {

@@ -53,6 +53,17 @@ LL_item* LL_create_item(void* data, size_t size_of_data) {
     return item;                            /* return created item            */
 }
 
+LL_item* LL_get_item_n(LL_base* list, size_t item_number) {
+    if(!list) return NULL;
+    LL_item* item = list->first;
+    if(item){
+        for(size_t i = 0; i < item_number && item->next; i++) {
+            item = item->next;
+        }
+    }
+    return item;
+}
+
 /*******************************************************************************
  * @brief LL_addf is function that add new list node to forward. 
  *
@@ -86,10 +97,8 @@ LL_base* LL_init_base(size_t data_size) {
     if(!list_base) return NULL;
 
     list_base->data_sz = data_size;
-    list_base->first    = malloc(sizeof(LL_item**));
-    list_base->last     = malloc(sizeof(LL_item**));
-    *(list_base->first) = NULL;
-    *(list_base->last)  = NULL;
+    list_base->first    = NULL;
+    list_base->last     = NULL;
     list_base->len      = 0;
 
     return list_base;
@@ -108,9 +117,7 @@ void LL_free_list_from(LL_item** current) {
 void LL_free_base(LL_base** list_base) {
     if(!(list_base && *list_base)) return;
     
-    LL_free_list_from((*list_base)->first);
-    free((*list_base)->first);
-    free((*list_base)->last);
+    LL_free_list_from(&((*list_base)->first));
     free(*list_base);
     *list_base = NULL;
 }
@@ -137,8 +144,8 @@ LL_EXEC_RESULT LL_pushf(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(LL_inc_len(list)) {
-        if(LL_addf(list->first, data, list->data_sz)) {
-            if(LL_length(list) == 1) *(list->last) = *(list->first);
+        if(LL_addf(&(list->first), data, list->data_sz)) {
+            if(LL_length(list) == 1) list->last = list->first;
             return LL_EXEC_SUCCESS;
         } else {
             LL_dec_len(list);
@@ -153,8 +160,8 @@ LL_EXEC_RESULT LL_popf(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(LL_dec_len(list)) {
-        LL_item* tmp_ptr = *(list->first);
-        *(list->first) = tmp_ptr->next;
+        LL_item* tmp_ptr = list->first;
+        list->first = list->first->next;
         memmove(data, tmp_ptr->data, list->data_sz);
         LL_free_item(&tmp_ptr);
     } else {
@@ -168,10 +175,9 @@ LL_EXEC_RESULT LL_pushb(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(LL_inc_len(list)) {
-        if(LL_addb(list->last, data, list->data_sz)){
-            if(LL_length(list) == 1) *(list->first) = *(list->last);
-            LL_item** tmp_ptr = list->last;
-            list->last = &((*tmp_ptr)->next);
+        if(LL_addb(&(list->last), data, list->data_sz)){
+            if(LL_length(list) == 1) list->first = list->last;
+            list->last = list->last->next;
             return LL_EXEC_SUCCESS;
         } else {
             LL_dec_len(list);
@@ -187,14 +193,9 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(LL_dec_len(list)) {
-        LL_item** tmp_ptr = list->last;
-        memmove(data, (*tmp_ptr)->data, list->data_sz);
-        LL_free_item(tmp_ptr);
-        tmp_ptr = list->first;
-        while((*tmp_ptr)->next) {
-            *tmp_ptr = (*tmp_ptr)->next;
-        }
-        *(list->last) = *tmp_ptr;
+        memmove(data, list->last->data, list->data_sz);
+        LL_free_item(&(list->last));
+        list->last = LL_get_item_n(list, LL_length(list) - 1);
         return LL_EXEC_SUCCESS;        
     } else {
         return LL_EXEC_LIST_EMPTY;
@@ -205,7 +206,7 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
 
 
 int main(void) {
-    int arr[] = {11,22,33};
+    int arr[] = {11}/*,22,33,44,55,66}*/;
     int temp_int = 0;
     LL_base* tlist = LL_init_base(sizeof(int));
     for(size_t i = 0; i < sizeof(arr) / sizeof(*arr); i++){
@@ -219,7 +220,7 @@ int main(void) {
     }
 
     for(size_t i = 0; i < sizeof(arr) / sizeof(*arr); i++){
-        LL_popb(tlist, &temp_int);
+        LL_popf(tlist, &temp_int);
         printf("List len: %"PRId64", temp_int: %d\n", tlist->len, temp_int);
     }
 
