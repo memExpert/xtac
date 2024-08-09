@@ -9,11 +9,18 @@ typedef struct linked_list_item
     void* data;
 } LL_item;
 
+typedef enum linked_list_state {
+    LL_READY,   /* list is free for use               */
+    LL_WR,      /* some thread just writing this list */
+    LL_RD       /* some thread just reading this list */
+} LL_state;
+
 typedef struct linked_list_base {
     LL_item** first;                 /* [*]->[ ]->[ ]->[ ]->NULL     */
     LL_item** last;                  /* [ ]->[ ]->[ ]->[*]->NULL     */
-    size_t   len;                   /* list length                  */
-    size_t   data_sz;               /* sizeof(your_own_t/default_t) */
+    size_t    len;                   /* list length                  */
+    size_t    data_sz;               /* sizeof(your_own_t/default_t) */
+    LL_state  state;                 /* current list state           */
 } LL_base;
 
 typedef enum {
@@ -25,21 +32,14 @@ typedef enum {
     LL_EXEC_LIST_EMPTY
 } LL_EXEC_RESULT;
 
-/*
-extern LL_base* LL_list_init (size_t data_size);
-extern size_t LL_list_len(const LL_base* list);
-extern bool LL_list_free (LL_base* to_free);
-extern bool LL_pushf (LL_base *list_base, void const *data);
-extern bool LL_pushb (LL_base *list_base, void const *data);
-extern bool LL_popf (LL_base *list_base, void *data);
-extern bool LL_popb (LL_base *list_base, void *data);
-*/
-/*
 
-extern bool LL_get_data(LL_item* const item, void const *data);
-extern bool LL_set_data(LL_item* const item, void const *data);
-extern LL_item LL_get_item(LL_base *list_base, size_t item_n);
-extern bool LL_rem_item(LL_base list_base, LL_item* item);
-extern bool LL_add_item(LL_base list_base, LL_item* item);
-*/
+extern size_t LL_length(LL_base* list);
+extern LL_base* LL_create_base(size_t data_size);
+extern LL_state LL_get_state(LL_base* list);
+extern LL_EXEC_RESULT LL_pushf(LL_base* list, void* data);
+extern LL_EXEC_RESULT LL_pushb(LL_base* list, void* data);
+extern LL_EXEC_RESULT LL_popf(LL_base* list, void* data);
+extern void LL_free_from(LL_item** current);
+extern void LL_free(LL_base** list_base);
+
 #endif

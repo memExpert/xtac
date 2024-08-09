@@ -120,6 +120,7 @@ LL_base* LL_create_base(size_t data_size) {
         list_base->data_sz = data_size;
         *(list_base->first) = NULL;
         *(list_base->last)  = NULL;
+        list_base->state    = LL_READY;
         list_base->len      = 0;
     }
     return list_base;
@@ -134,7 +135,7 @@ void LL_free_from(LL_item** current) {
     *current = NULL;
 }
 
-void LL_free_base(LL_base** list_base) {
+void LL_free(LL_base** list_base) {
     if(!list_base || !*list_base) return;
 
     LL_free_from((*list_base)->first);
@@ -216,7 +217,7 @@ LL_EXEC_RESULT LL_popf(LL_base* list, void* data) {
     }
     return LL_EXEC_SUCCESS;
 }
-
+/*
 LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
@@ -241,7 +242,7 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
         return LL_EXEC_LIST_EMPTY;
     }
 }
-
+*/
 
 
 
@@ -287,6 +288,6 @@ int main(void) {
     }
     printf("%d %d\n", (*tlist->first) == NULL, (*tlist->last) == NULL);
     */
-    LL_free_base(&tlist);
+    LL_free(&tlist);
     return 0;
 }
