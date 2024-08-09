@@ -1,11 +1,11 @@
 /**
  * @file list.h
- * @author Hanchar Maksim (pottermax2000@gmail.com)
+ * @author Hanchar Maksim (hancharmaksimq@gmail.com)
  * @brief 
  * @version 0.1
  * @date 2024-08-09
  * 
- * @copyright Copyright (c) 2024
+ * @copyright Copyright (c) 2024 Hanchar Maksim
  * 
  */
 #ifndef __LIST_H
@@ -19,9 +19,10 @@ typedef struct linked_list_item {
 } LL_item;
 
 typedef enum linked_list_state {
-    LL_READY,   /* list is free for use               */
-    LL_WR,      /* some thread just writing this list */
-    LL_RD       /* some thread just reading this list */
+    LL_READY,   /* list is free for use                           */
+    LL_NA,      /* list isn't exitst or something else went wrong */
+    LL_WR,      /* some thread just writing this list             */
+    LL_RD       /* some thread just reading this list             */
 } LL_state;
 
 typedef struct linked_list_base {

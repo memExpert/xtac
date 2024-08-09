@@ -1,13 +1,13 @@
-/*******************************************************************************
+/**
  * @file list.c
- * @author Maksim Hanchar (Maksim.Hanchar@belcommunmash.by)
+ * @author Hanchar Maksim (hancharmaksimq@gmail.com)
  * @brief 
  * @version 0.1
- * @date 08-08-2024
+ * @date 2024-08-09
  * 
- * @copyright Copyright (c) 2024
+ * @copyright Copyright (c) 2024 Hanchar Maksim
  * 
-*******************************************************************************/
+ */
 
 #include "../../includes/list.h"
 #include <inttypes.h>
@@ -18,6 +18,10 @@
 
 size_t LL_length(const LL_base* list) {
     return list ? list->len : 0;
+}
+
+LL_state LL_get_state(const LL_base* list) {
+    return list ? list->state : LL_NA;
 }
 
 static LL_item* LL_init_item(void) {
