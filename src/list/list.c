@@ -236,12 +236,14 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
             }
         }
         *(list->last) = tmp_ptr2;
-        LL_free_item((&(*(list->last))->next));
+        if(list->len == 1) {
+            LL_free_item(list->first);
+        } else {
+            LL_free_item(&((*(list->last))->next));
+        }
         
         list->len--;
     } else {
-        LL_free_item(list->first);
-        *(list->last) = NULL;
         return LL_EXEC_LIST_EMPTY;
     }
     return LL_EXEC_SUCCESS;
@@ -302,7 +304,7 @@ int main(void) {
         LL_pushb(tlist, &(arr[i]));
         printf("item i = %"PRId64" dig = %d\n", tlist->len, arr[i]);
     }
-    while(LL_popf(tlist, &temp_int) != LL_EXEC_LIST_EMPTY) {
+    while(LL_popb(tlist, &temp_int) != LL_EXEC_LIST_EMPTY) {
         printf("List len: %"PRId64", temp_int: %d\n", tlist->len, temp_int);
     }
     /*
