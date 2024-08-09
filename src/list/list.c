@@ -221,6 +221,31 @@ LL_EXEC_RESULT LL_popf(LL_base* list, void* data) {
     }
     return LL_EXEC_SUCCESS;
 }
+
+
+LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
+    if(!list) return LL_EXEC_NULL_BASE_PTR;
+
+    if(list->len > 0) {
+        memmove(data, (*(list->last))->data, list->data_sz);
+        LL_item* tmp_ptr  = *(list->first);
+        LL_item* tmp_ptr2 = *(list->first);
+        for(size_t i = 0; tmp_ptr; tmp_ptr = tmp_ptr->next, i++){
+            if(i > 1) {
+                tmp_ptr2 = tmp_ptr2->next;
+            }
+        }
+        *(list->last) = tmp_ptr2;
+        LL_free_item((&(*(list->last))->next));
+        
+        list->len--;
+    } else {
+        LL_free_item(list->first);
+        *(list->last) = NULL;
+        return LL_EXEC_LIST_EMPTY;
+    }
+    return LL_EXEC_SUCCESS;
+}
 /*
 LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
@@ -290,7 +315,6 @@ int main(void) {
         LL_popf(tlist, &temp_int);
         printf("List len: %"PRId64", temp_int: %d\n", tlist->len, temp_int);
     }
-    printf("%d %d\n", (*tlist->first) == NULL, (*tlist->last) == NULL);
     */
     LL_free(&tlist);
     return 0;
