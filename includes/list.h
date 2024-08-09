@@ -1,10 +1,19 @@
+/**
+ * @file list.h
+ * @author Hanchar Maksim (pottermax2000@gmail.com)
+ * @brief 
+ * @version 0.1
+ * @date 2024-08-09
+ * 
+ * @copyright Copyright (c) 2024
+ * 
+ */
 #ifndef __LIST_H
 #define __LIST_H
 #include <stddef.h>
 #include <stdbool.h>
 
-typedef struct linked_list_item
-{   
+typedef struct linked_list_item {   
     struct linked_list_item* next;
     void* data;
 } LL_item;
@@ -33,13 +42,23 @@ typedef enum {
 } LL_EXEC_RESULT;
 
 
-extern size_t LL_length(LL_base* list);
+extern size_t LL_length(const LL_base* list);
 extern LL_base* LL_create_base(size_t data_size);
-extern LL_state LL_get_state(LL_base* list);
-extern LL_EXEC_RESULT LL_pushf(LL_base* list, void* data);
-extern LL_EXEC_RESULT LL_pushb(LL_base* list, void* data);
+extern LL_state LL_get_state(const LL_base* list);
+extern LL_EXEC_RESULT LL_pushf(LL_base* list, const void* data);
+extern LL_EXEC_RESULT LL_pushb(LL_base* list, const void* data);
 extern LL_EXEC_RESULT LL_popf(LL_base* list, void* data);
-extern void LL_free_from(LL_item** current);
 extern void LL_free(LL_base** list_base);
+/*
+TODO next functions:
+extern void* LL_getval(LL_base* list, size_t pos);
+extern LL_EXEC_RESULT LL_getdel(LL_base* list, void* data, size_t pos);
+extern LL_EXEC_RESULT LL_delete(LL_base* list, size_t pos);
+extern LL_EXEC_RESULT LL_insert(LL_base* list, size_t pos);
+extern LL_EXEC_RESULT LL_popb(LL_base* list, void* data);
+extern void LL_free_from(size_t pos);
+extern void LL_free_to(size_t pos);
+*/
+
 
 #endif

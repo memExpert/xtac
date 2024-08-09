@@ -16,11 +16,11 @@
 
 #include <stdio.h> /* temporary */
 
-size_t LL_length(LL_base* list) {
+size_t LL_length(const LL_base* list) {
     return list ? list->len : 0;
 }
 
-LL_item* LL_init_item(void) {
+static LL_item* LL_init_item(void) {
     LL_item* item = (LL_item*) malloc(sizeof(LL_item));
     if(!item) return NULL;
 
@@ -30,7 +30,7 @@ LL_item* LL_init_item(void) {
     return item;
 }
 
-void LL_free_item(LL_item** item) {
+static void LL_free_item(LL_item** item) {
     if(!(item && *item)) return;
     LL_item* tmp = *item;
     *item = NULL;
@@ -38,7 +38,7 @@ void LL_free_item(LL_item** item) {
     free(tmp);
 }
 
-LL_item* LL_create_item(void* data, size_t size_of_data) {
+static LL_item* LL_create_item(const void* data, size_t size_of_data) {
     if(!data) return NULL;             /* If provided argument is NULL        */
 
     LL_item* item = LL_init_item();    /* Init memory for new item object     */
@@ -75,7 +75,7 @@ LL_item* LL_get_item(LL_base* list, size_t item_number) {
  * @return true if all ok 
  * @return false if can't memorry allocate
 *******************************************************************************/
-bool LL_addf(LL_item** current, void* data, size_t size_of_data) {
+static bool LL_addf(LL_item** current, const void* data, size_t size_of_data) {
     LL_item*  new_item = LL_create_item(data, size_of_data);
     if(!new_item) return false;
 
@@ -84,7 +84,7 @@ bool LL_addf(LL_item** current, void* data, size_t size_of_data) {
     return true;
 }
 
-bool LL_addb(LL_item** current, void*data, size_t size_of_data) {
+static bool LL_addb(LL_item** current, const void* data, size_t size_of_data) {
     if(!current) return false;
 
     LL_item* new_item = LL_create_item(data, size_of_data);
@@ -96,7 +96,7 @@ bool LL_addb(LL_item** current, void*data, size_t size_of_data) {
     return true;
 }
 
-LL_base* LL_alloc_base(void) {
+static LL_base* LL_alloc_base(void) {
     LL_base* list_base = (LL_base*) malloc (sizeof(LL_base));
     if(!list_base) return NULL;
 
@@ -126,7 +126,7 @@ LL_base* LL_create_base(size_t data_size) {
     return list_base;
 }
 
-void LL_free_from(LL_item** current) {
+static void LL_free_from(LL_item** current) {
     if(!current || !(*current)) {
         return;
     }
@@ -165,7 +165,7 @@ static bool LL_dec_len (LL_base* list_base) {
     }
 }
 
-LL_EXEC_RESULT LL_pushf(LL_base* list, void* data) {
+LL_EXEC_RESULT LL_pushf(LL_base* list, const void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(LL_inc_len(list)) {
@@ -183,7 +183,7 @@ LL_EXEC_RESULT LL_pushf(LL_base* list, void* data) {
     }
 }
 
-LL_EXEC_RESULT LL_pushb(LL_base* list, void* data) {
+LL_EXEC_RESULT LL_pushb(LL_base* list, const void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(LL_inc_len(list)) {
@@ -273,7 +273,7 @@ int main(void) {
         LL_pushb(tlist, &(arr[i]));
         printf("item i = %"PRId64" dig = %d\n", tlist->len, arr[i]);
     }
-    while(LL_popb(tlist, &temp_int) != LL_EXEC_LIST_EMPTY) {
+    while(LL_popf(tlist, &temp_int) != LL_EXEC_LIST_EMPTY) {
         printf("List len: %"PRId64", temp_int: %d\n", tlist->len, temp_int);
     }
     /*
