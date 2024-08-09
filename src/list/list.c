@@ -9,7 +9,7 @@
  * 
 *******************************************************************************/
 
-#include "../includes/list2.h"
+#include "../../includes/list.h"
 #include <inttypes.h>
 #include <malloc.h>
 #include <string.h>
@@ -32,9 +32,10 @@ LL_item* LL_init_item(void) {
 
 void LL_free_item(LL_item** item) {
     if(!(item && *item)) return;
-    free((*item)->data);
-    free(*item);
+    LL_item* tmp = *item;
     *item = NULL;
+    free(tmp->data);
+    free(tmp);
 }
 
 LL_item* LL_create_item(void* data, size_t size_of_data) {
@@ -52,8 +53,9 @@ LL_item* LL_create_item(void* data, size_t size_of_data) {
     return item;                            /* return created item            */
 }
 
-LL_item* LL_get_item_n(LL_base* list, size_t item_number) {
-    if(!list) return NULL;
+/*
+LL_item* LL_get_item(LL_base* list, size_t item_number) {
+    if(!list || item_number >= LL_length(list)) return NULL;
     LL_item* item = list->first;
     if(item){
         for(size_t i = 0; i < item_number && item->next; i++) {
@@ -62,6 +64,7 @@ LL_item* LL_get_item_n(LL_base* list, size_t item_number) {
     }
     return item;
 }
+*/
 
 /*******************************************************************************
  * @brief LL_addf is function that add new list node to forward. 
@@ -86,39 +89,61 @@ bool LL_addb(LL_item** current, void*data, size_t size_of_data) {
 
     LL_item* new_item = LL_create_item(data, size_of_data);
     if(!new_item) return false;
-
-    (*current)->next = new_item;
+    if(*current){
+        (*current)->next = new_item;
+    }
+    (*current) = new_item;
     return true;
 }
 
-LL_base* LL_init_base(size_t data_size) {
+LL_base* LL_alloc_base(void) {
     LL_base* list_base = (LL_base*) malloc (sizeof(LL_base));
     if(!list_base) return NULL;
 
-    list_base->data_sz = data_size;
-    list_base->first    = NULL;
-    list_base->last     = NULL;
-    list_base->len      = 0;
-
+    list_base->first = malloc(sizeof(LL_item**));
+    if(!list_base->first) {
+        free(list_base);
+        return NULL;
+    }
+    list_base->last = malloc(sizeof(LL_item**));
+    if(!list_base->last) {
+        free(list_base->first);
+        free(list_base);
+        return NULL;
+    }
     return list_base;
 }
 
-void LL_free_list_from(LL_item** current) {
-    printf("LL_free_list_from \n");
+LL_base* LL_create_base(size_t data_size) {
+    LL_base* list_base = LL_alloc_base();
+    if (list_base) {
+        list_base->data_sz = data_size;
+        *(list_base->first) = NULL;
+        *(list_base->last)  = NULL;
+        list_base->len      = 0;
+    }
+    return list_base;
+}
+
+void LL_free_from(LL_item** current) {
     if(!current || !(*current)) {
         return;
     }
-    LL_free_list_from(&((*current)->next));
+    LL_free_from(&((*current)->next));
     LL_free_item(current);
     *current = NULL;
 }
 
 void LL_free_base(LL_base** list_base) {
-    if(!(list_base && *list_base)) return;
-    
-    LL_free_list_from(&((*list_base)->first));
-    free(*list_base);
+    if(!list_base || !*list_base) return;
+
+    LL_free_from((*list_base)->first);
+    LL_base* tmp = *list_base;
     *list_base = NULL;
+
+    free(tmp->first);
+    free(tmp->last);
+    free(tmp);
 }
 
 static bool LL_inc_len (LL_base* list_base) {
@@ -143,9 +168,27 @@ LL_EXEC_RESULT LL_pushf(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(LL_inc_len(list)) {
-        if(LL_addf(&(list->first), data, list->data_sz)) {
+        if(LL_addf(list->first, data, list->data_sz)) {
             if(LL_length(list) == 1) {
-                list->last = list->first;
+                *(list->last) = *(list->first);
+            }
+            return LL_EXEC_SUCCESS;
+        } else {
+            LL_dec_len(list);
+            return LL_EXEC_NO_MEMORY;
+        }
+    } else {
+        return LL_EXEC_LIST_FULL;
+    }
+}
+
+LL_EXEC_RESULT LL_pushb(LL_base* list, void* data) {
+    if(!list) return LL_EXEC_NULL_BASE_PTR;
+
+    if(LL_inc_len(list)) {
+        if(LL_addb(list->last, data, list->data_sz)){
+            if(LL_length(list) == 1) {
+                *(list->first) = *(list->last);
             }
             return LL_EXEC_SUCCESS;
         } else {
@@ -161,48 +204,37 @@ LL_EXEC_RESULT LL_popf(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(LL_dec_len(list)) {
-        memmove(data, list->first, list->data_sz);
-        LL_item* tmp_ptr = list->first->next;
-        LL_free_item(&list->first);
-        list->first = tmp_ptr;
+        memmove(data, (*(list->first))->data, list->data_sz);
+        LL_item* tmp_ptr = *(list->first);
+        *(list->first) = (*(list->first))->next;
+        if(LL_length(list) == 0) {
+            *(list->last) = *(list->first);
+        }
+        LL_free_item(&tmp_ptr);
     } else {
         return LL_EXEC_LIST_EMPTY;
     }
     return LL_EXEC_SUCCESS;
 }
 
-
-LL_EXEC_RESULT LL_pushb(LL_base* list, void* data) {
-    if(!list) return LL_EXEC_NULL_BASE_PTR;
-
-    if(LL_inc_len(list)) {
-        if(LL_addb(&(list->last), data, list->data_sz)){
-            if(LL_length(list) == 1) {
-                list->first = list->last;
-            }
-            list->last = list->last->next;
-            return LL_EXEC_SUCCESS;
-        } else {
-            LL_dec_len(list);
-            return LL_EXEC_NO_MEMORY;
-        }
-    } else {
-        return LL_EXEC_LIST_FULL;
-    }
-}
-
-
 LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(LL_dec_len(list)) {
-        memmove(data, list->last->data, list->data_sz);
-        LL_free_item(&(list->last));  /* TODO memory leak? Maybe i need to  */
-                                      /* return to ptr to ptr in LL_base    */
-        if(LL_length(list) == 0) {    /* I must think about it because      */
-            list->last = list->first; /* this can target on memory leak     */
+        memmove(data, (*(list->last))->data, list->data_sz);
+        if(LL_length(list) > 0) {
+            LL_item* tmp_ptr = *(list->first);
+            while(tmp_ptr && tmp_ptr->next && tmp_ptr->next->next){
+                tmp_ptr = tmp_ptr->next;
+            }
+            LL_free_item(&(tmp_ptr->next));
+            while(tmp_ptr && tmp_ptr->next){
+                tmp_ptr = tmp_ptr->next;
+            }
+            *(list->last) = tmp_ptr;
         } else {
-            list->last = LL_get_item_n(list, LL_length(list) - 1);
+            *(list->first) = *(list->last);
+            LL_free_item(list->last);
         }
         return LL_EXEC_SUCCESS;        
     } else {
@@ -214,21 +246,38 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
 
 
 int main(void) {
+    /*
+    int a = 15;
+    LL_item** test_itempp = (LL_item**) malloc(sizeof(LL_item*));
+    test_itempp = NULL;
+    LL_item*  test_itemp = LL_create_item(&a, sizeof(int));
+    test_itemp->next = LL_create_item(&a, sizeof(int));
+    test_itempp = &test_itemp;
+    LL_free_item(&((*test_itempp)->next));
+    printf("%d %d %d\n", *test_itempp == NULL, test_itemp == NULL, test_itemp->next == NULL);
+    LL_free_item(&((*test_itempp)));
+    printf("%d %d\n", *test_itempp == NULL, test_itemp == NULL);
+    return 0;
+    */
+    
     int arr[] = {11,22,33,44,55,66};
     int temp_int = 0;
-    LL_base* tlist = LL_init_base(sizeof(int));
+    LL_base* tlist = LL_create_base(sizeof(int));
     for(size_t i = 0; i < sizeof(arr) / sizeof(*arr); i++){
         LL_pushf(tlist, &(arr[i]));
-        printf("List len: %"PRId64"\n", tlist->len);
+        printf("item i = %"PRId64" dig = %d\n", tlist->len, arr[i]);
     }
 
     for(size_t i = 0; i < sizeof(arr) / sizeof(*arr); i++){
         LL_pushb(tlist, &(arr[i]));
-        printf("List len: %"PRId64"\n", tlist->len);
+        printf("item i = %"PRId64" dig = %d\n", tlist->len, arr[i]);
     }
-
+    while(LL_popb(tlist, &temp_int) != LL_EXEC_LIST_EMPTY) {
+        printf("List len: %"PRId64", temp_int: %d\n", tlist->len, temp_int);
+    }
+    /*
     for(size_t i = 0; i < sizeof(arr) / sizeof(*arr); i++){
-        LL_popf(tlist, &temp_int);
+        LL_popb(tlist, &temp_int);
         printf("List len: %"PRId64", temp_int: %d\n", tlist->len, temp_int);
     }
 
@@ -236,23 +285,8 @@ int main(void) {
         LL_popf(tlist, &temp_int);
         printf("List len: %"PRId64", temp_int: %d\n", tlist->len, temp_int);
     }
-
-    if(tlist->first) {
-        printf("first memory leak detected\n");
-        if(tlist->first->next) {
-            printf("ooooo...");
-        }
-    }
-    if(tlist->last) {
-        printf("Second memory leak detected\n");
-        if(tlist->last->next) {
-            printf("hhhhhhhhhhhhhh???\n");
-        }
-        if(tlist->last->next->next){
-            printf("\n 2:00 AM, why i'm here?\n\n");
-        }
-    }
-
-
+    printf("%d %d\n", (*tlist->first) == NULL, (*tlist->last) == NULL);
+    */
+    LL_free_base(&tlist);
     return 0;
 }
