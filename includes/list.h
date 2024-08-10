@@ -22,6 +22,8 @@
 создавать внутри себя такой же подсписок и относительно него считаться главным. Все это будет работать рекурсивно.
 
 Много элементов L1 списка -> увеличение количества элементов L2 списка -> увеличение количества элементов L3 списка.
+
+Еще сильнее это ускорить получится сделав список двусвязным.
 */
 
 #ifndef __LIST_H
@@ -55,18 +57,25 @@ typedef enum {
     LL_EXEC_NO_MEMORY,
     LL_EXEC_LIST_BLOCKED,
     LL_EXEC_LIST_FULL,
-    LL_EXEC_LIST_EMPTY
+    LL_EXEC_LIST_EMPTY,
+    LL_EXEC_INDEX_OUT_OF_RANGE,
+    LL_EXEC_NO_DATA_PTR
 } LL_EXEC_RESULT;
 
 
-extern size_t LL_length(const LL_base* list);
-extern LL_base* LL_create_base(size_t data_size);
-extern LL_state LL_get_state(const LL_base* list);
-extern LL_EXEC_RESULT LL_pushf(LL_base* list, const void* data);
-extern LL_EXEC_RESULT LL_pushb(LL_base* list, const void* data);
-extern LL_EXEC_RESULT LL_popf(LL_base* list, void* data);
-extern LL_EXEC_RESULT LL_popb(LL_base* list, void* data);
-extern void LL_free(LL_base** list_base);
+extern size_t LL_length (const LL_base* list);
+extern LL_base* LL_create_base (size_t data_size);
+extern LL_state LL_get_state (const LL_base* list);
+extern LL_EXEC_RESULT LL_pushf (LL_base* list, const void* data);
+extern LL_EXEC_RESULT LL_pushb (LL_base* list, const void* data);
+extern LL_EXEC_RESULT LL_popf (LL_base* list, void* data);
+extern LL_EXEC_RESULT LL_popb (LL_base* list, void* data);
+extern LL_EXEC_RESULT LL_getn (const LL_base* list, void* dst, size_t n);
+extern LL_EXEC_RESULT LL_setn (LL_base* list, const void* data, size_t pos);
+extern LL_EXEC_RESULT LL_insn (LL_base* list, const void* data, size_t pos);
+extern LL_EXEC_RESULT LL_deln (LL_base* list, const void* data, size_t pos);
+
+extern void LL_free (LL_base** list_base);
 /*
 TODO next functions:
 extern void* LL_getval(LL_base* list, size_t pos);
