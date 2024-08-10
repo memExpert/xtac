@@ -16,6 +16,8 @@
 
 #include <stdio.h> /* temporary */
 
+#define LIST_CONTAIN_LAST_ITEM 1
+
 size_t LL_length(const LL_base* list) {
     return list ? list->len : 0;
 }
@@ -151,75 +153,53 @@ void LL_free(LL_base** list_base) {
     free(tmp);
 }
 
-static bool LL_inc_len (LL_base* list_base) {
-    if(list_base && list_base->len < SIZE_MAX) {
-        list_base->len++;
-        return true;
-    } else {
-        return false;
-    }
-}
-
-static bool LL_dec_len (LL_base* list_base) {
-    if(list_base && list_base->len > 0) {
-        list_base->len--;
-        return true;
-    } else {
-        return false;
-    }
-}
-
 LL_EXEC_RESULT LL_pushf(LL_base* list, const void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
-    if(LL_inc_len(list)) {
+    if(list->len < SIZE_MAX) {
         if(LL_addf(list->first, data, list->data_sz)) {
-            if(LL_length(list) == 1) {
+            list->len++;
+            if(LL_length(list) == LIST_CONTAIN_LAST_ITEM) {
                 *(list->last) = *(list->first);
             }
             return LL_EXEC_SUCCESS;
-        } else {
-            LL_dec_len(list);
-            return LL_EXEC_NO_MEMORY;
-        }
-    } else {
-        return LL_EXEC_LIST_FULL;
-    }
+        } else return LL_EXEC_NO_MEMORY;
+    } else return LL_EXEC_LIST_FULL;
 }
 
 LL_EXEC_RESULT LL_pushb(LL_base* list, const void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
-    if(LL_inc_len(list)) {
+    if(list->len < SIZE_MAX) {
         if(LL_addb(list->last, data, list->data_sz)){
-            if(LL_length(list) == 1) {
+            list->len++;
+            if(LL_length(list) == LIST_CONTAIN_LAST_ITEM) {
                 *(list->first) = *(list->last);
             }
             return LL_EXEC_SUCCESS;
-        } else {
-            LL_dec_len(list);
-            return LL_EXEC_NO_MEMORY;
-        }
-    } else {
-        return LL_EXEC_LIST_FULL;
-    }
+        } else return LL_EXEC_NO_MEMORY;    /* no memory for LL_item alloc */
+    } else return LL_EXEC_LIST_FULL;        /* list length > SIZE_MAX      */
 }
 
 LL_EXEC_RESULT LL_popf(LL_base* list, void* data) {
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
-    if(LL_dec_len(list)) {
+    if(*(list->first)) {
         memmove(data, (*(list->first))->data, list->data_sz);
         LL_item* tmp_ptr = *(list->first);
-        *(list->first) = (*(list->first))->next;
-        if(LL_length(list) == 0) {
+        if(LL_length(list) == LIST_CONTAIN_LAST_ITEM) {
             *(list->last) = *(list->first);
+        } else {
+            *(list->first) = (*(list->first))->next;
         }
-        LL_free_item(&tmp_ptr);
-    } else {
-        return LL_EXEC_LIST_EMPTY;
-    }
-    return LL_EXEC_SUCCESS;
+        if(LL_length(list) == LIST_CONTAIN_LAST_ITEM) {
+            LL_free_item(list->first);
+        } else {
+            LL_free_item(&tmp_ptr);
+        }
+        list->len--;
+        return LL_EXEC_SUCCESS;
+    } else return LL_EXEC_LIST_EMPTY;
 }
 
 
@@ -236,16 +216,13 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
             }
         }
         *(list->last) = tmp_ptr2;
-        if(list->len == 1) {
+        if(LL_length(list) == LIST_CONTAIN_LAST_ITEM) {
             LL_free_item(list->first);
         } else {
             LL_free_item(&((*(list->last))->next));
         }
-        
         list->len--;
-    } else {
-        return LL_EXEC_LIST_EMPTY;
-    }
+    } else return LL_EXEC_LIST_EMPTY;
     return LL_EXEC_SUCCESS;
 }
 /*
@@ -304,7 +281,7 @@ int main(void) {
         LL_pushb(tlist, &(arr[i]));
         printf("item i = %"PRId64" dig = %d\n", tlist->len, arr[i]);
     }
-    while(LL_popb(tlist, &temp_int) != LL_EXEC_LIST_EMPTY) {
+    while(LL_popf(tlist, &temp_int) != LL_EXEC_LIST_EMPTY) {
         printf("List len: %"PRId64", temp_int: %d\n", tlist->len, temp_int);
     }
     /*
@@ -321,3 +298,5 @@ int main(void) {
     LL_free(&tlist);
     return 0;
 }
+
+#undef LIST_CONTAIN_LAST_ITEM
