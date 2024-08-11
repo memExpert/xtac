@@ -81,21 +81,28 @@ void tearDown(void) {
     while(LL_popf(list, NULL) != LL_EXEC_LIST_EMPTY);
 }
 
-
+void test_create_base(void) {
+    LL_base* list = NULL;
+    list = LL_create_base(sizeof(int));
+    
+    TEST_ASSERT_NOT_NULL_MESSAGE(list, "List base isn't allocated.");
+    TEST_ASSERT_NOT_NULL_MESSAGE(list->first,"List 'first' field isn't allocated");
+    TEST_ASSERT_NOT_NULL_MESSAGE(list->last, "List 'last' field isn't allocated");
+    TEST_ASSERT_EQUAL_size_t_MESSAGE(0, list->len, "List init len not equal 0");
+    TEST_ASSERT_EQUAL_size_t_MESSAGE(sizeof(int), list->data_sz, "Wrong list data size");
+    TEST_ASSERT_EQUAL_INT_MESSAGE(LL_READY, list->state, "Wrong list state");
+}
 
 void test_pushf(void) {
-    LL_EXEC_RESULT result;
-    int tmp = 0;
-    result = LL_pushf(list, arr);
-    LL_getn(list, &tmp, 0);
-    TEST_ASSERT_EQUAL_INT(arr[0], tmp);
-    TEST_ASSERT_EQUAL_INT(LL_EXEC_SUCCESS, result);
+    TEST_ASSERT_EQUAL_INT(LL_EXEC_SUCCESS, LL_pushf(list, arr));
+    TEST_ASSERT_EQUAL_INT(arr[0], *(int*)((*(list->first))->data));
 }
 
 
 // not needed when using generate_test_runner.rb
 int main(void) {
     UNITY_BEGIN();
+    RUN_TEST(test_create_base);
     RUN_TEST(test_pushf);
     return UNITY_END();
 }
