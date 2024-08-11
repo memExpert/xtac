@@ -14,8 +14,8 @@
 #include <malloc.h>
 #include <string.h>
 
-static enum {list_len_0 = 0};
-static enum {list_len_1 = 1};
+enum {list_len_0 = 0};
+enum {list_len_1 = 1};
 
 size_t LL_length(const LL_base* list) {
     return list ? list->len : list_len_0;
@@ -279,16 +279,16 @@ LL_EXEC_RESULT LL_insn(LL_base* list, const void* data, size_t pos) {
 }
 
 
-LL_EXEC_RESULT LL_deln(LL_base* list, const void* data, size_t pos) {
+
+LL_EXEC_RESULT LL_deln(LL_base* list, void* data, size_t pos) {
     LL_EXEC_RESULT result;
     LL_item* current = NULL;
     LL_item* precurrent = NULL;
-    LL_item* postcurrent = NULL;
 
     if(pos == 0) {
-        return LL_popf(list, NULL);
+        result = LL_popf(list, data);
     } else if (pos == LL_length(list)) {
-        return LL_popb(list, NULL);
+        result = LL_popb(list, data);
     } else {
         result = LL_get_item(list, &current, pos);
         

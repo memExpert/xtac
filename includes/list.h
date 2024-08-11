@@ -26,8 +26,8 @@
 Еще сильнее это ускорить получится сделав список двусвязным.
 */
 
-#ifndef __LIST_H
-#define __LIST_H
+#ifndef _XTAC_LINKED_LIST_H
+#define _XTAC_LINKED_LIST_H
 #include <stddef.h>
 #include <stdbool.h>
 
@@ -52,36 +52,31 @@ typedef struct linked_list_base {
 } LL_base;
 
 typedef enum {
-    LL_EXEC_SUCCESS = 0,
-    LL_EXEC_NULL_BASE_PTR,
-    LL_EXEC_NO_MEMORY,
-    LL_EXEC_LIST_BLOCKED,
-    LL_EXEC_LIST_FULL,
-    LL_EXEC_LIST_EMPTY,
-    LL_EXEC_INDEX_OUT_OF_RANGE,
-    LL_EXEC_NO_DATA_PTR
+    LL_EXEC_SUCCESS = 0,             /* execution OK             */
+    LL_EXEC_NULL_BASE_PTR,           /* LL_base == NULL          */
+    LL_EXEC_NO_MEMORY,               /* can't allocate memory for new object  */
+    LL_EXEC_LIST_BLOCKED,            /* some thread blocked list */
+    LL_EXEC_LIST_FULL,               /* list size == SIZE_MAX    */
+    LL_EXEC_LIST_EMPTY,              /* list size == 0           */
+    LL_EXEC_INDEX_OUT_OF_RANGE,      /* [get]n(list,n) if n > LL_length(list) */
+    LL_EXEC_NO_DATA_PTR              /* if trying to push NULL   */
 } LL_EXEC_RESULT;
 
+size_t LL_length (const LL_base* list);
+LL_base* LL_create_base (size_t data_size);
+LL_state LL_get_state (const LL_base* list);
+LL_EXEC_RESULT LL_pushf (LL_base* list, const void* data);
+LL_EXEC_RESULT LL_pushb (LL_base* list, const void* data);
+LL_EXEC_RESULT LL_popf (LL_base* list, void* data);
+LL_EXEC_RESULT LL_popb (LL_base* list, void* data);
+LL_EXEC_RESULT LL_getn (const LL_base* list, void* dst, size_t n);
+LL_EXEC_RESULT LL_setn (LL_base* list, const void* data, size_t pos);
+LL_EXEC_RESULT LL_insn (LL_base* list, const void* data, size_t pos);
+LL_EXEC_RESULT LL_deln (LL_base* list, void* data, size_t pos);
 
-extern size_t LL_length (const LL_base* list);
-extern LL_base* LL_create_base (size_t data_size);
-extern LL_state LL_get_state (const LL_base* list);
-extern LL_EXEC_RESULT LL_pushf (LL_base* list, const void* data);
-extern LL_EXEC_RESULT LL_pushb (LL_base* list, const void* data);
-extern LL_EXEC_RESULT LL_popf (LL_base* list, void* data);
-extern LL_EXEC_RESULT LL_popb (LL_base* list, void* data);
-extern LL_EXEC_RESULT LL_getn (const LL_base* list, void* dst, size_t n);
-extern LL_EXEC_RESULT LL_setn (LL_base* list, const void* data, size_t pos);
-extern LL_EXEC_RESULT LL_insn (LL_base* list, const void* data, size_t pos);
-extern LL_EXEC_RESULT LL_deln (LL_base* list, const void* data, size_t pos);
-
-extern void LL_free (LL_base** list_base);
+void LL_free (LL_base** list_base);
 /*
 TODO next functions:
-extern void* LL_getval(LL_base* list, size_t pos);
-extern LL_EXEC_RESULT LL_delete(LL_base* list, size_t pos);
-extern LL_EXEC_RESULT LL_getdel(LL_base* list, void* data, size_t pos);
-extern LL_EXEC_RESULT LL_insert(LL_base* list, void* data, size_t pos);
 extern void LL_free_from(size_t pos);
 extern void LL_free_to(size_t pos);
 extern size_t LL_search(LL_base* list);
