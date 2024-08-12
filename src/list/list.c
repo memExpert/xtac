@@ -17,12 +17,21 @@
 enum {list_len_0 = 0};
 enum {list_len_1 = 1};
 
-size_t LL_length(const LL_base* list) {
-    return list ? list->len : list_len_0;
-}
 
-LL_state LL_get_state(const LL_base* list) {
-    return list ? list->state : LL_NA;
+/*******************************************************************************
+ *                     STATIC FUNCTIONS IMPLEMENTATION 
+ ******************************************************************************/
+static LL_EXEC_RESULT LL_get_item(const LL_base* list, LL_item** dst, size_t pos) {
+    if(!list) return LL_EXEC_NULL_BASE_PTR;
+    if(!*(list->first)) return LL_EXEC_LIST_EMPTY;
+    if(pos >= LL_length(list)) return LL_EXEC_INDEX_OUT_OF_RANGE;
+
+    LL_item* current = *(list->first);
+    for(size_t i = 0; i < pos; i++) {
+        current = current->next;
+    }
+    *dst = current;
+    return LL_EXEC_SUCCESS;
 }
 
 static LL_item* LL_init_item(void) {
@@ -34,6 +43,7 @@ static LL_item* LL_init_item(void) {
 
     return item;
 }
+
 
 static void LL_free_item(LL_item** item) {
     if(!(item && *item)) return;
@@ -59,7 +69,7 @@ static LL_item* LL_create_item(const void* data, size_t size_of_data) {
     return item;                            /* return created item            */
 }
 
-/*******************************************************************************
+/**
  * @brief LL_addf is function that add new list node to forward. 
  *
  * @param current 
@@ -67,7 +77,7 @@ static LL_item* LL_create_item(const void* data, size_t size_of_data) {
  * @param size_of_data 
  * @return true if all ok 
  * @return false if can't memorry allocate
-*******************************************************************************/
+ */
 static bool LL_addf(LL_item** current, const void* data, size_t size_of_data) {
     LL_item*  new_item = LL_create_item(data, size_of_data);
     if(!new_item) return false;
@@ -107,6 +117,29 @@ static LL_base* LL_alloc_base(void) {
     return list_base;
 }
 
+static void LL_free_from(LL_item** current) {
+    if(!current || !(*current)) {
+        return;
+    }
+    LL_free_from(&((*current)->next));
+    LL_free_item(current);
+    *current = NULL;
+}
+
+/*******************************************************************************
+ *                              GLOBAL FUNCTIONS
+ ******************************************************************************/
+
+
+size_t LL_length(const LL_base* list) {
+    return list ? list->len : list_len_0;
+}
+
+LL_state LL_get_state(const LL_base* list) {
+    return list ? list->state : LL_NA;
+}
+
+
 LL_base* LL_create_base(size_t data_size) {
     LL_base* list_base = LL_alloc_base();
     if (list_base) {
@@ -119,14 +152,6 @@ LL_base* LL_create_base(size_t data_size) {
     return list_base;
 }
 
-static void LL_free_from(LL_item** current) {
-    if(!current || !(*current)) {
-        return;
-    }
-    LL_free_from(&((*current)->next));
-    LL_free_item(current);
-    *current = NULL;
-}
 
 void LL_free(LL_base** list_base) {
     if(!list_base || !*list_base) return;
@@ -212,19 +237,6 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
         }
         list->len--;
     } else return LL_EXEC_LIST_EMPTY;
-    return LL_EXEC_SUCCESS;
-}
-
-static LL_EXEC_RESULT LL_get_item(const LL_base* list, LL_item** dst, size_t pos) {
-    if(!list) return LL_EXEC_NULL_BASE_PTR;
-    if(!*(list->first)) return LL_EXEC_LIST_EMPTY;
-    if(pos >= LL_length(list)) return LL_EXEC_INDEX_OUT_OF_RANGE;
-
-    LL_item* current = *(list->first);
-    for(size_t i = 0; i < pos; i++) {
-        current = current->next;
-    }
-    *dst = current;
     return LL_EXEC_SUCCESS;
 }
 
