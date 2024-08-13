@@ -69,7 +69,7 @@ LL_EXEC_RESULT LL_pushf (LL_base* list, const void* data);
 LL_EXEC_RESULT LL_pushb (LL_base* list, const void* data);
 LL_EXEC_RESULT LL_popf (LL_base* list, void* data);
 LL_EXEC_RESULT LL_popb (LL_base* list, void* data);
-LL_EXEC_RESULT LL_getn (const LL_base* list, void* dst, size_t n);
+LL_EXEC_RESULT LL_getn (const LL_base* list, void* dst, size_t pos);
 LL_EXEC_RESULT LL_setn (LL_base* list, const void* data, size_t pos);
 LL_EXEC_RESULT LL_insn (LL_base* list, const void* data, size_t pos);
 LL_EXEC_RESULT LL_deln (LL_base* list, void* data, size_t pos);

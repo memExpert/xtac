@@ -169,12 +169,23 @@ void test_deln(void) {
         LL_pushb(list, arr + i);
     }
     TEST_ASSERT_EQUAL_INT(LL_EXEC_SUCCESS, LL_deln(list, &temp, 3));
-    TEST_ASSERT_EQUAL_INT(list->len, 4);
+    TEST_ASSERT_EQUAL_INT(list->len, arr_size - 1);
     TEST_ASSERT_EQUAL_INT(arr[3], temp);
 }
 
+void test_insn(void) {
+    size_t arr_size = sizeof(arr) / sizeof(*arr);
+    int temp = 0;
+    for(size_t i = 0; i < arr_size; i++){
+        LL_pushb(list, arr + i);
+    }
+    TEST_ASSERT_EQUAL_INT(LL_EXEC_SUCCESS, LL_insn(list, arr, 2));
+    TEST_ASSERT_EQUAL_INT(arr_size + 1, list->len);
+    LL_getn(list, &temp, 2);
+    TEST_ASSERT_EQUAL_INT(arr[0], temp);
+}
 
-// not needed when using generate_test_runner.rb
+
 int main(void) {
     UNITY_BEGIN();
     RUN_TEST(test_create_base);
@@ -184,6 +195,7 @@ int main(void) {
     RUN_TEST(test_popf);
     RUN_TEST(test_popb);
     RUN_TEST(test_deln);
+    RUN_TEST(test_insn);
 
     return UNITY_END();
 }

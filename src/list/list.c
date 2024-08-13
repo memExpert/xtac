@@ -282,6 +282,7 @@ LL_EXEC_RESULT LL_insn(LL_base* list, const void* data, size_t pos) {
 
             precurrent->next = new;
             new->next = current;
+            list->len++;
         }
     }
     return result;
