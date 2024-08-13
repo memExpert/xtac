@@ -222,13 +222,10 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
             memmove(data, (*(list->last))->data, list->data_sz);
         }
         LL_item* tmp_ptr  = *(list->first);
-        LL_item* tmp_ptr2 = *(list->first);
-        for(size_t i = 0; tmp_ptr; tmp_ptr = tmp_ptr->next, i++){
-            if(i > 1) {
-                tmp_ptr2 = tmp_ptr2->next;
-            }
+        for(size_t i = 0; tmp_ptr && tmp_ptr->next != *(list->last); i++) {
+            tmp_ptr = tmp_ptr->next;
         }
-        *(list->last) = tmp_ptr2;
+        *(list->last) = tmp_ptr;
         if(LL_length(list) == list_len_1) {
             LL_free_item(list->first);
             *(list->last) = *(list->first);
@@ -274,7 +271,7 @@ LL_EXEC_RESULT LL_insn(LL_base* list, const void* data, size_t pos) {
 
     if(pos == 0) {
         return LL_pushf(list, data);
-    } else if (pos == LL_length(list)) {
+    } else if (pos == LL_length(list) - 1) {
         return LL_pushb(list, data);
     } else {
         result = LL_get_item(list, &current, pos);
@@ -292,25 +289,26 @@ LL_EXEC_RESULT LL_insn(LL_base* list, const void* data, size_t pos) {
 
 
 
-LL_EXEC_RESULT LL_deln(LL_base* list, void* data, size_t pos) {
+LL_EXEC_RESULT LL_deln(LL_base* list, void* dst, size_t pos) {
     LL_EXEC_RESULT result;
     LL_item* current = NULL;
     LL_item* precurrent = NULL;
 
     if(pos == 0) {
-        result = LL_popf(list, data);
-    } else if (pos == LL_length(list)) {
-        result = LL_popb(list, data);
+        result = LL_popf(list, dst);
+    } else if (pos == LL_length(list) - 1) {
+        result = LL_popb(list, dst);
     } else {
         result = LL_get_item(list, &current, pos);
         
         if(result == LL_EXEC_SUCCESS) {
-            if(data) {
-                memmove(data, current->data, list->data_sz);
+            if(dst) {
+                memmove(dst, current->data, list->data_sz);
             }
             LL_get_item(list, &precurrent, pos - 1);
             precurrent->next = current->next;
             LL_free_item(&current);
+            list->len--;
         }
     }
     return result;

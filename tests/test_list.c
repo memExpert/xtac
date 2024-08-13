@@ -141,6 +141,9 @@ void test_popf(void) {
         TEST_ASSERT_EQUAL_INT(arr[i], temp);
         TEST_ASSERT_EQUAL_INT(i, list->len);
     }
+    TEST_ASSERT_NULL(*(list->first));
+    TEST_ASSERT_NULL(*(list->last));
+    TEST_ASSERT_EQUAL_INT(0, list->len);
 }
 
 
@@ -151,9 +154,23 @@ void test_popb(void) {
         LL_pushf(list, arr + i);
     }
     for(size_t i = 0; LL_popb(list, &temp) != LL_EXEC_LIST_EMPTY && i < arr_size; i++) {
-        TEST_ASSERT_EQUAL_INT(arr[i], temp);
-        TEST_ASSERT_EQUAL_INT(arr_size - i, list->len);
+        TEST_ASSERT_EQUAL_INT_MESSAGE(arr[i], temp, "arr[i] != temp");
+        TEST_ASSERT_EQUAL_INT_MESSAGE(arr_size - (i + 1), list->len, "list->len is wrong");
     }
+    TEST_ASSERT_NULL(*(list->first));
+    TEST_ASSERT_NULL(*(list->last));
+    TEST_ASSERT_EQUAL_INT(0, list->len);
+}
+
+void test_deln(void) {
+    size_t arr_size = sizeof(arr) / sizeof(*arr);
+    int temp = 0;
+    for(size_t i = 0; i < arr_size; i++){
+        LL_pushb(list, arr + i);
+    }
+    TEST_ASSERT_EQUAL_INT(LL_EXEC_SUCCESS, LL_deln(list, &temp, 3));
+    TEST_ASSERT_EQUAL_INT(list->len, 4);
+    TEST_ASSERT_EQUAL_INT(arr[3], temp);
 }
 
 
@@ -165,7 +182,8 @@ int main(void) {
     RUN_TEST(test_pushb);
     RUN_TEST(test_getn);
     RUN_TEST(test_popf);
-    //RUN_TEST(test_popb);
+    RUN_TEST(test_popb);
+    RUN_TEST(test_deln);
 
     return UNITY_END();
 }

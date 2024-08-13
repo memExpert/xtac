@@ -77,8 +77,6 @@ LL_EXEC_RESULT LL_deln (LL_base* list, void* data, size_t pos);
 void LL_free (LL_base** list_base);
 /*
 TODO next functions:
-extern void LL_free_from(size_t pos);
-extern void LL_free_to(size_t pos);
 extern size_t LL_search(LL_base* list);
 extern LL_EXEC_RESULT LL_sort(...);
 extern void* LL_to_arr(...);
