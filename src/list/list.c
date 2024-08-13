@@ -9,7 +9,7 @@
  * 
  */
 
-#include "../../includes/list.h"
+#include "list.h"
 #include <inttypes.h>
 #include <malloc.h>
 #include <string.h>
