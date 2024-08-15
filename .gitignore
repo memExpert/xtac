@@ -1,0 +1,10 @@
+.vscode
+*.cmake
+.ninja*
+Testing/
+external/Unity
+CMakeFiles/
+CMakePresets*
+DartConfiguration.tcl
+build.ninja
+build
