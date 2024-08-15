@@ -8,3 +8,4 @@ This project is at the very beginning of its journey. I will be very glad to con
 
 * [Unity](https://github.com/ThrowTheSwitch/Unity/tree/master?tab=readme-ov-file) for unit tests;
 * [Valgrind](https://valgrind.org/) for memory leaks detection.
+* [CMake](https://cmake.org/)

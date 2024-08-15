@@ -2,6 +2,7 @@
 *.cmake
 .ninja*
 Testing/
+CMakeCache.txt
 external/Unity
 CMakeFiles/
 CMakePresets*
