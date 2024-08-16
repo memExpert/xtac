@@ -2,7 +2,7 @@
 #include "list.h"
 
 static LL_base* list = NULL;
-static arr[] = {1, 2, 3, 4, 5};
+static int arr[] = {1, 2, 3, 4, 5};
 size_t arr_size = sizeof(arr) / sizeof(*arr);
 
 void setUp(void) {
@@ -18,8 +18,8 @@ void tearDown(void) {
 
 void test_popf(void) {
     int temp = 0;
-    for(size_t i = arr_size - 1; LL_popf(list, &temp) != LL_EXEC_LIST_EMPTY; i--) {
-        TEST_ASSERT_EQUAL_INT(arr[i], temp);
+    for(size_t i = arr_size - 1; LL_popf(list, &temp) != LL_EXEC_LIST_EMPTY && i; i--) {
+        TEST_ASSERT_EQUAL_INT(arr[arr_size - (i + 1)], temp);
         TEST_ASSERT_EQUAL_INT(i, list->len);
     }
     TEST_ASSERT_NULL(*(list->first));

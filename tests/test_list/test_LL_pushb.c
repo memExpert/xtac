@@ -2,7 +2,7 @@
 #include "list.h"
 
 static LL_base* list = NULL;
-static arr[] = {1, 2, 3, 4, 5};
+static int arr[] = {1, 2, 3, 4, 5};
 size_t arr_size = sizeof(arr) / sizeof(*arr);
 
 void setUp(void) {

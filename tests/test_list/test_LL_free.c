@@ -2,7 +2,7 @@
 #include "list.h"
 
 static LL_base* list = NULL;
-static arr[] = {1, 2, 3, 4, 5};
+static int arr[] = {1, 2, 3, 4, 5};
 
 void setUp(void) {
     list = LL_create_base(sizeof(int));
@@ -13,11 +13,7 @@ void setUp(void) {
 }
 
 void tearDown(void) {
-    while(LL_popf(list, NULL) != LL_EXEC_LIST_EMPTY);
-    free(list->first);
-    free(list->last);
-    free(list);
-    list = NULL;
+    LL_free(&list);
 }
 
 void test_LL_free(void) {

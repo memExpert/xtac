@@ -2,7 +2,7 @@
 #include "list.h"
 
 static LL_base* list = NULL;
-static arr[] = {1, 2, 3, 4, 5};
+static int arr[] = {1, 2, 3, 4, 5};
 
 void setUp(void) {
     list = LL_create_base(sizeof(int));
@@ -22,7 +22,7 @@ void test_LL_deln(void) {
     TEST_ASSERT_EQUAL_INT(list->len, arr_size - 1);
     TEST_ASSERT_EQUAL_INT(arr[3], temp);
     TEST_ASSERT_EQUAL_INT(LL_EXEC_SUCCESS, LL_deln(list, &temp, 0));
-    TEST_ASSERT_EQUAL_INT(list->len, arr_size - 1);
+    TEST_ASSERT_EQUAL_INT(list->len, arr_size - 2);
     TEST_ASSERT_EQUAL_INT(arr[0], temp);
 }
 
