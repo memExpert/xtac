@@ -1,11 +1,2 @@
 .vscode
-*.cmake
-.ninja*
-Testing/
-CMakeCache.txt
-external/Unity
-CMakeFiles/
-CMakePresets*
-DartConfiguration.tcl
-build.ninja
 build
