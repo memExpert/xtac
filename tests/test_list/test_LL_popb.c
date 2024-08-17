@@ -18,7 +18,7 @@ void tearDown(void) {
 
 void test_popb(void) {
     int temp = 0;
-    for(size_t i = 0; LL_popb(list, &temp) != LL_EXEC_LIST_EMPTY && i < arr_size; i++) {
+    for(size_t i = 0; LL_popb(list, &temp) != LL_EXEC_LIST_EMPTY; i++) {
         TEST_ASSERT_EQUAL_INT_MESSAGE(arr[arr_size - (i + 1)], temp, "arr[i] != temp");
         TEST_ASSERT_EQUAL_INT_MESSAGE(arr_size - (i + 1), list->len, "list->len is wrong");
     }

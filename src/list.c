@@ -21,7 +21,8 @@ enum {list_len_1 = 1};
 /*******************************************************************************
  *                     STATIC FUNCTIONS IMPLEMENTATION 
  ******************************************************************************/
-static LL_EXEC_RESULT LL_get_item(const LL_base* list, LL_item** dst, size_t pos) {
+static LL_EXEC_RESULT LL_get_item (const LL_base* list, LL_item** dst, size_t pos)
+{
     if(!list) return LL_EXEC_NULL_BASE_PTR;
     if(!*(list->first)) return LL_EXEC_LIST_EMPTY;
     if(pos >= LL_length(list)) return LL_EXEC_INDEX_OUT_OF_RANGE;
@@ -34,7 +35,8 @@ static LL_EXEC_RESULT LL_get_item(const LL_base* list, LL_item** dst, size_t pos
     return LL_EXEC_SUCCESS;
 }
 
-static LL_item* LL_init_item(void) {
+static LL_item* LL_init_item (void)
+{
     LL_item* item = (LL_item*) malloc(sizeof(LL_item));
     if(!item) return NULL;
 
@@ -45,7 +47,8 @@ static LL_item* LL_init_item(void) {
 }
 
 
-static void LL_free_item(LL_item** item) {
+static void LL_free_item (LL_item** item)
+{
     if(!(item && *item)) return;
     free((*item)->data);
     (*item)->next = NULL;
@@ -54,7 +57,8 @@ static void LL_free_item(LL_item** item) {
     *item = NULL;   
 }
 
-static LL_item* LL_create_item(const void* data, size_t size_of_data) {
+static LL_item* LL_create_item (const void* data, size_t size_of_data)
+{
     if(!data) return NULL;             /* If provided argument is NULL        */
 
     LL_item* item = LL_init_item();    /* Init memory for new item object     */
@@ -78,7 +82,8 @@ static LL_item* LL_create_item(const void* data, size_t size_of_data) {
  * @return true if all ok 
  * @return false if can't memorry allocate
  */
-static bool LL_addf(LL_item** current, const void* data, size_t size_of_data) {
+static bool LL_addf (LL_item** current, const void* data, size_t size_of_data)
+{
     LL_item*  new_item = LL_create_item(data, size_of_data);
     if(!new_item) return false;
 
@@ -87,7 +92,8 @@ static bool LL_addf(LL_item** current, const void* data, size_t size_of_data) {
     return true;
 }
 
-static bool LL_addb(LL_item** current, const void* data, size_t size_of_data) {
+static bool LL_addb (LL_item** current, const void* data, size_t size_of_data)
+{
     if(!current) return false;
 
     LL_item* new_item = LL_create_item(data, size_of_data);
@@ -99,7 +105,8 @@ static bool LL_addb(LL_item** current, const void* data, size_t size_of_data) {
     return true;
 }
 
-static LL_base* LL_alloc_base(void) {
+static LL_base* LL_alloc_base (void)
+{
     LL_base* list_base = (LL_base*) malloc (sizeof(LL_base));
     if(!list_base) return NULL;
 
@@ -117,7 +124,8 @@ static LL_base* LL_alloc_base(void) {
     return list_base;
 }
 
-static void LL_free_from(LL_item** current) {
+static void LL_free_from (LL_item** current)
+{
     if(!current || !(*current)) {
         return;
     }
@@ -131,16 +139,19 @@ static void LL_free_from(LL_item** current) {
  ******************************************************************************/
 
 
-size_t LL_length(const LL_base* list) {
+size_t LL_length (const LL_base* list)
+{
     return list ? list->len : list_len_0;
 }
 
-LL_state LL_get_state(const LL_base* list) {
+LL_state LL_get_state (const LL_base* list)
+{
     return list ? list->state : LL_NA;
 }
 
 
-LL_base* LL_create_base(size_t data_size) {
+LL_base* LL_create_base (size_t data_size)
+{
     LL_base* list_base = LL_alloc_base();
     if (list_base) {
         list_base->data_sz = data_size;
@@ -153,7 +164,8 @@ LL_base* LL_create_base(size_t data_size) {
 }
 
 
-void LL_free(LL_base** list_base) {
+void LL_free (LL_base** list_base)
+{
     if(!list_base || !*list_base) return;
 
     LL_free_from((*list_base)->first);
@@ -165,7 +177,8 @@ void LL_free(LL_base** list_base) {
     free(tmp);
 }
 
-LL_EXEC_RESULT LL_pushf(LL_base* list, const void* data) {
+LL_EXEC_RESULT LL_pushf (LL_base* list, const void* data)
+{
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(list->len < SIZE_MAX) {
@@ -179,7 +192,8 @@ LL_EXEC_RESULT LL_pushf(LL_base* list, const void* data) {
     } else return LL_EXEC_LIST_FULL;        /* list length > SIZE_MAX      */
 }
 
-LL_EXEC_RESULT LL_pushb(LL_base* list, const void* data) {
+LL_EXEC_RESULT LL_pushb (LL_base* list, const void* data)
+{
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(list->len < SIZE_MAX) {
@@ -193,7 +207,8 @@ LL_EXEC_RESULT LL_pushb(LL_base* list, const void* data) {
     } else return LL_EXEC_LIST_FULL;        /* list length > SIZE_MAX      */
 }
 
-LL_EXEC_RESULT LL_popf(LL_base* list, void* data) {
+LL_EXEC_RESULT LL_popf (LL_base* list, void* data)
+{
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(*(list->first)) {
@@ -214,7 +229,8 @@ LL_EXEC_RESULT LL_popf(LL_base* list, void* data) {
 }
 
 
-LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
+LL_EXEC_RESULT LL_popb (LL_base* list, void* data) 
+{
     if(!list) return LL_EXEC_NULL_BASE_PTR;
 
     if(*(list->first)) {
@@ -233,12 +249,13 @@ LL_EXEC_RESULT LL_popb(LL_base* list, void* data) {
             LL_free_item(&((*(list->last))->next));
         }
         list->len--;
+        return LL_EXEC_SUCCESS;
     } else return LL_EXEC_LIST_EMPTY;
-    return LL_EXEC_SUCCESS;
 }
 
 
-LL_EXEC_RESULT LL_getn(const LL_base* list, void* data, size_t pos) {
+LL_EXEC_RESULT LL_getn (const LL_base* list, void* data, size_t pos)
+{
     if(!data) return LL_EXEC_NO_DATA_PTR;
     LL_EXEC_RESULT result;
     LL_item* current = NULL;
@@ -250,7 +267,8 @@ LL_EXEC_RESULT LL_getn(const LL_base* list, void* data, size_t pos) {
     return result;
 }
 
-LL_EXEC_RESULT LL_setn(LL_base* list, const void* data, size_t pos) {
+LL_EXEC_RESULT LL_setn (LL_base* list, const void* data, size_t pos)
+{
     if(!data) return LL_EXEC_NO_DATA_PTR;
     LL_EXEC_RESULT result;
     LL_item* current = NULL;
@@ -262,7 +280,8 @@ LL_EXEC_RESULT LL_setn(LL_base* list, const void* data, size_t pos) {
     return result;
 }
 
-LL_EXEC_RESULT LL_insn(LL_base* list, const void* data, size_t pos) {
+LL_EXEC_RESULT LL_insn (LL_base* list, const void* data, size_t pos)
+{
     if(!data) return LL_EXEC_NO_DATA_PTR;
     LL_EXEC_RESULT result;
     LL_item* current = NULL;
@@ -290,7 +309,8 @@ LL_EXEC_RESULT LL_insn(LL_base* list, const void* data, size_t pos) {
 
 
 
-LL_EXEC_RESULT LL_deln(LL_base* list, void* dst, size_t pos) {
+LL_EXEC_RESULT LL_deln (LL_base* list, void* dst, size_t pos)
+{
     LL_EXEC_RESULT result;
     LL_item* current = NULL;
     LL_item* precurrent = NULL;

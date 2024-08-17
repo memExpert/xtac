@@ -11,6 +11,22 @@
 
 #ifndef _XTAC_LINKED_LIST_H
 #define _XTAC_LINKED_LIST_H
+
+
+
+#define XTAC_LL_VERSION_MAJOR    0
+#define XTAC_LL_VERSION_MINOR    0
+#define XTAC_LL_VERSION_BUILD    1
+#define XTAX_LL_VERSION          ((XTAC_LL_VERSION_MAJOR << 16) | \
+                                  (XTAC_LL_VERSION_MINOR << 8)  | \
+                                   XTAC_LL_VERSION_BUILD)
+
+#ifdef __cplusplus
+extern "C"
+{
+#endif
+
+
 #include <stddef.h>
 #include <stdbool.h>
 
@@ -175,5 +191,8 @@ extern void* LL_to_arr(...);
 extern LL_base* LL_cp(LL_base* list);
 */
 
-
+/* end of XTAC_LL_LIBRARY */
+#ifdef __cplusplus
+}
+#endif
 #endif

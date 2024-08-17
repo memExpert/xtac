@@ -18,7 +18,7 @@ void tearDown(void) {
 
 void test_popf(void) {
     int temp = 0;
-    for(size_t i = arr_size - 1; LL_popf(list, &temp) != LL_EXEC_LIST_EMPTY && i; i--) {
+    for(size_t i = arr_size - 1; LL_popf(list, &temp) != LL_EXEC_LIST_EMPTY; i--) {
         TEST_ASSERT_EQUAL_INT(arr[arr_size - (i + 1)], temp);
         TEST_ASSERT_EQUAL_INT(i, list->len);
     }
