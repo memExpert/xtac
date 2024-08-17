@@ -1,0 +1,23 @@
+cmake_minimum_required(VERSION 3.5.0)
+project(xtac VERSION 0.1.0 LANGUAGES C)
+
+set(TARGET_GROUP production CACHE STRING "Group to build")
+include_directories(include)
+add_subdirectory(src)
+
+if(TARGET_GROUP STREQUAL production)
+    set(CMAKE_BUILD_TYPE Release)
+    set(PACK_GENERATOR "DEB")
+    set(CPACK_PACKAGE_NAME ${PROJECT_NAME})
+    set(CPACK_PACKAGE_VERSION ${PROJECT_VERSION})
+    set(CPACK_DEBIAN_PACKAGE_MAINTAINER "Maksim Hanchar")
+    include(CPack)
+elseif(TARGET_GROUP  STREQUAL test)
+    set(CMAKE_BUILD_TYPE Debug)
+    include(CTest)
+
+    add_subdirectory(external)
+    add_subdirectory(tests)
+else()
+    message(FATAL_ERROR "Given TARGET_GROUP unknown")
+endif()
