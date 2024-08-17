@@ -1,6 +1,11 @@
-set(SOURCES list.c)
-add_library(list_a STATIC ${SOURCES} )
+set(LIST_SOURCES list.c)
 
-target_include_directories(list_a PUBLIC
+if(TARGET_GROUP STREQUAL test)
+  set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -pedantic ")
+endif()
+
+add_library(list STATIC ${LIST_SOURCES})
+
+target_include_directories(list PUBLIC
   ${CMAKE_CURRENT_LIST_DIR}
 )

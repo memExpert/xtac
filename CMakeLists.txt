@@ -6,10 +6,12 @@ include_directories(include)
 add_subdirectory(src)
 
 if(TARGET_GROUP STREQUAL production)
+    set(CMAKE_BUILD_TYPE Release)
     set(CPACK_PROJECT_NAME ${PROJECT_NAME})
     set(CPACK_PROJECT_VERSION ${PROJECT_VERSION})
     include(CPack)
 elseif(TARGET_GROUP  STREQUAL test)
+    set(CMAKE_BUILD_TYPE Debug)
     include(CTest)
 
     add_subdirectory(external)
