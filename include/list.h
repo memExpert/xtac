@@ -13,14 +13,6 @@
 #define _XTAC_LINKED_LIST_H
 
 
-
-#define XTAC_LL_VERSION_MAJOR    0
-#define XTAC_LL_VERSION_MINOR    0
-#define XTAC_LL_VERSION_BUILD    1
-#define XTAX_LL_VERSION          ((XTAC_LL_VERSION_MAJOR << 16) | \
-                                  (XTAC_LL_VERSION_MINOR << 8)  | \
-                                   XTAC_LL_VERSION_BUILD)
-
 #ifdef __cplusplus
 extern "C"
 {
