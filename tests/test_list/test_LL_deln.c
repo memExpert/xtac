@@ -24,6 +24,10 @@ void test_LL_deln(void) {
     TEST_ASSERT_EQUAL_INT(LL_EXEC_SUCCESS, LL_deln(list, &temp, 0));
     TEST_ASSERT_EQUAL_INT(list->len, arr_size - 2);
     TEST_ASSERT_EQUAL_INT(arr[0], temp);
+    TEST_ASSERT_EQUAL_INT(LL_EXEC_SUCCESS, LL_deln(list, &temp, LL_length(list) - 1));
+    TEST_ASSERT_EQUAL_INT(list->len, arr_size - 3);
+    TEST_ASSERT_EQUAL_INT(arr[4], temp);
+    TEST_ASSERT_EQUAL_INT(LL_EXEC_INDEX_OUT_OF_RANGE, LL_deln(list, &temp, LL_length(list)));
 }
 
 int main(void) {
